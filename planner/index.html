@@ -2068,11 +2068,29 @@ function renderWalls(){
 }
 
 let wallDragging=false, wallDragIdx=-1, wallDragOx=0, wallDragOy=0;
+let selectedWallIdx=-1;
 function onWallMouseDown(e){
   // Ignore clicks on the handle buttons
   if(e.target.classList.contains('wall-delete')||e.target.classList.contains('wall-rotate')) return;
   e.preventDefault(); e.stopPropagation();
   const idx=parseInt(e.currentTarget.dataset.widx);
+  // Select this wall + deselect furniture
+  selectedWallIdx=idx;
+  selectItem(null);
+  // Update PTZ hint
+  const hint=document.getElementById('ptzHint');
+  if(hint) hint.textContent=walls[idx]?walls[idx].type.charAt(0).toUpperCase()+walls[idx].type.slice(1):'Wall';
+  // Highlight selected wall
+  document.querySelectorAll('.wall-elem').forEach((el,i)=>{
+    el.classList.toggle('selected-wall',i===idx);
+  });
+  // Auto-expand panel on mobile
+  const panel=document.getElementById('sidebarRight');
+  if(panel&&window.innerWidth<=768){
+    panel.classList.add('panel-expanded');
+    const btn=document.getElementById('panelCollapseBtn');
+    if(btn) btn.textContent='▼';
+  }
   wallDragging=true; wallDragIdx=idx;
   const cr=document.getElementById('roomCanvas').getBoundingClientRect();
   const{ox,oy}=getCW();
@@ -2227,6 +2245,10 @@ document.getElementById('roomCanvas').addEventListener('mousedown',e=>{
   const t=e.target;
   if(t===document.getElementById('roomCanvas')||t.tagName==='svg'||t.tagName==='path'||t.tagName==='line'||t.tagName==='text'){
     selectItem(null);
+    selectedWallIdx=-1;
+    document.querySelectorAll('.wall-elem').forEach(el=>el.classList.remove('selected-wall'));
+    const hint=document.getElementById('ptzHint');
+    if(hint) hint.textContent='← tap item to move';
   }
 });
 
@@ -2236,6 +2258,9 @@ function selectItem(id){
   selected=id;
   renderItems();
   if(id){
+    // Deselect any wall when furniture is selected
+    selectedWallIdx=-1;
+    document.querySelectorAll('.wall-elem').forEach(el=>el.classList.remove('selected-wall'));
     switchTab('props');
     const hint=document.getElementById('ptzHint');
     if(hint){const item=items.find(i=>i.id===id);hint.textContent=item?item.label:'selected';}
@@ -2344,12 +2369,12 @@ document.getElementById('btnRedo').addEventListener('click',()=>{if(!future.leng
 document.getElementById('btnAddWindow').addEventListener('click',()=>{
   saveHistory();const b=getBounds();
   walls.push({type:'window',orient:'h',px:b.minX+(b.maxX-b.minX)*0.3,py:b.minY,size:1.2});
-  renderCanvas();renderWalls();
+  selectItem(null);selectedWallIdx=-1;renderCanvas();renderWalls();
 });
 document.getElementById('btnAddDoor').addEventListener('click',()=>{
   saveHistory();const b=getBounds();
   walls.push({type:'door',orient:'v',px:b.minX,py:b.minY+(b.maxY-b.minY)*0.15,size:0.9});
-  renderCanvas();renderWalls();
+  selectItem(null);selectedWallIdx=-1;renderCanvas();renderWalls();
 });
 
 // ─── CLEAR / EXPORT ──────────────────────────────────────────────
@@ -2932,6 +2957,19 @@ function setPtzStep(px,btn){
   btn.classList.add('active');
 }
 function ptzMove(dx,dy){
+  // Move selected wall if one is selected
+  if(selectedWallIdx>=0 && selectedWallIdx<walls.length){
+    saveHistory();
+    const{ox,oy}=getCW();
+    const w=walls[selectedWallIdx];
+    const stepM=ptzStep/SCALE; // convert px step to metres
+    const b=getBounds();
+    w.px=Math.max(b.minX,Math.min(w.px+dx*stepM, b.maxX));
+    w.py=Math.max(b.minY,Math.min(w.py+dy*stepM, b.maxY));
+    renderWalls();
+    return;
+  }
+  // Move selected furniture item
   const item=items.find(i=>i.id===selected);
   if(!item) return;
   saveHistory();
