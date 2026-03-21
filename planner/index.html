@@ -289,8 +289,8 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
 }
 
 /* ── PTZ Move Pad (mobile only) ─────────────────────────────── */
-/* PTZ hidden on desktop */
-.ptz-row{display:none!important;}
+/* PTZ hidden on desktop only */
+@media(min-width:769px){.ptz-row{display:none!important;}}
 /* Print / PDF styles */
 @media print{
   body{overflow:visible!important;}
