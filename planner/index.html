@@ -156,8 +156,10 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
   .app-body{
     flex-direction:column;
     height:calc(100vh - 48px);
+    height:calc(100dvh - 48px);
     overflow:hidden;
     position:relative;
+    display:flex;
   }
 
   /* Furniture strip */
@@ -197,7 +199,12 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
     background:var(--panel);
     border-bottom:1px solid var(--border);
     width:100%;
+    min-height:122px;
+    height:122px;
     flex-shrink:0;
+    overflow:visible;
+    position:relative;
+    z-index:5;
   }
   .ptz-grid{
     display:grid!important;
@@ -265,7 +272,8 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
     border-bottom:none!important;
     cursor:pointer;
   }
-  .panel-content{padding:0.6rem;flex:1;overflow-y:auto;display:block!important;font-size:0.85rem;}
+  .panel-content{padding:0.6rem;overflow-y:auto;font-size:0.85rem;flex:1;}
+  .panel-content.active-panel{display:block!important;}
   .warn-strip{display:none!important;}
 
   /* Modal full screen */
@@ -2558,7 +2566,10 @@ function switchTab(tab){
     const cap=t.charAt(0).toUpperCase()+t.slice(1);
     document.getElementById('tab'+cap)?.classList.toggle('active',t===tab);
     const panel=document.getElementById('panel'+cap);
-    if(panel) panel.style.display=t===tab?'block':'none';
+    if(panel){
+      panel.style.display=t===tab?'block':'none';
+      panel.classList.toggle('active-panel',t===tab);
+    }
   });
   if(tab==='props') renderProps();
 }
