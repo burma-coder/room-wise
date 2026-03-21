@@ -207,6 +207,41 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
   .tool-btn span, .tool-sep{display:none;}
   .tool-btn{padding:0.28rem 0.4rem;}
 }
+
+/* ── PTZ Move Pad (mobile) ──────────────────────────────────── */
+.ptz-pad{display:none;}
+@media(max-width:768px){
+  .ptz-pad{
+    display:grid;
+    grid-template-columns:repeat(3,36px);
+    grid-template-rows:repeat(3,36px);
+    gap:3px;
+    margin:8px auto 4px;
+    width:fit-content;
+  }
+  .ptz-btn{
+    width:36px;height:36px;
+    background:var(--panel);
+    border:1.5px solid var(--border);
+    border-radius:6px;
+    font-size:1rem;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--charcoal);
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  .ptz-btn:active{background:var(--terra);color:#fff;border-color:var(--terra);}
+  .ptz-btn.ptz-empty{background:transparent;border:none;pointer-events:none;}
+  .ptz-step-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;}
+  .ptz-step-btn{
+    padding:3px 10px;font-size:0.7rem;
+    background:var(--panel);border:1px solid var(--border);
+    border-radius:4px;cursor:pointer;color:var(--muted);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ptz-step-btn.active{background:var(--terra);color:#fff;border-color:var(--terra);}
+}
 /* Print / PDF styles */
 @media print{
   body{overflow:visible!important;}
@@ -445,6 +480,26 @@ kbd{background:var(--border);padding:1px 5px;border-radius:2px;font-size:0.73rem
     <div class="panel-content" id="panelProps">
       <div class="prop-empty" id="propEmpty"><p>Click any furniture on the canvas to edit its size, position, and colour.</p></div>
       <div id="propEditor" style="display:none"></div>
+      <!-- PTZ move pad — visible on mobile only -->
+      <div class="ptz-pad" id="ptzPad">
+        <div class="ptz-step-row" style="grid-column:1/-1;display:flex;">
+          <span style="font-size:0.7rem;color:var(--muted);">Step:</span>
+          <button class="ptz-step-btn active" data-step="5" onclick="setPtzStep(5,this)">S</button>
+          <button class="ptz-step-btn" data-step="15" onclick="setPtzStep(15,this)">M</button>
+          <button class="ptz-step-btn" data-step="30" onclick="setPtzStep(30,this)">L</button>
+        </div>
+        <div class="ptz-btn ptz-empty"></div>
+        <button class="ptz-btn" ontouchstart="ptzMove(0,-1)" onclick="ptzMove(0,-1)">▲</button>
+        <div class="ptz-btn ptz-empty"></div>
+        <button class="ptz-btn" ontouchstart="ptzMove(-1,0)" onclick="ptzMove(-1,0)">◀</button>
+        <div class="ptz-btn ptz-empty" style="background:rgba(196,102,58,0.08);border-radius:50%;border:1.5px solid var(--terra);">
+          <span style="font-size:0.55rem;color:var(--terra);font-weight:600;">MOVE</span>
+        </div>
+        <button class="ptz-btn" ontouchstart="ptzMove(1,0)" onclick="ptzMove(1,0)">▶</button>
+        <div class="ptz-btn ptz-empty"></div>
+        <button class="ptz-btn" ontouchstart="ptzMove(0,1)" onclick="ptzMove(0,1)">▼</button>
+        <div class="ptz-btn ptz-empty"></div>
+      </div>
     </div>
     <div class="panel-content" id="panelInfo" style="display:none">
       <p style="font-family:'Playfair Display',serif;font-size:0.92rem;font-weight:700;margin-bottom:0.65rem;">Design Tips</p>
@@ -1792,7 +1847,6 @@ function renderItems(){
       <div class="furn-label" style="position:absolute;top:100%;margin-top:4px;left:50%;transform:translateX(-50%) rotate(${-(isBed?0:rot)}deg);white-space:nowrap;color:#1A2840;font-size:9px;font-family:DM Sans,sans-serif;pointer-events:none;text-align:center;font-weight:500;line-height:1.3;">${item.label}<br/><span style="color:#5878A8;font-size:8px;font-weight:400">${fmtDim(item.w,item.h)}</span></div>
     `;
     el.addEventListener('mousedown',onItemMouseDown);
-    el.addEventListener('touchstart',onItemTouchStart,{passive:false});
     document.getElementById('roomCanvas').appendChild(el);
   });
   checkWarnings();
@@ -2115,32 +2169,6 @@ document.getElementById('roomCanvas').addEventListener('click',e=>{
 });
 
 // Background click to deselect
-// ─── TOUCH DRAG SUPPORT ───────────────────────────────────────────
-function onItemTouchStart(e){
-  e.preventDefault();
-  const touch=e.touches[0];
-  // Simulate mousedown
-  const me=new MouseEvent('mousedown',{clientX:touch.clientX,clientY:touch.clientY,bubbles:true});
-  e.currentTarget.dispatchEvent(me);
-}
-
-document.addEventListener('touchmove',e=>{
-  if(isDragging||wallDragging) e.preventDefault();
-},{passive:false});
-
-document.addEventListener('touchmove',e=>{
-  if(!isDragging&&!wallDragging) return;
-  const touch=e.touches[0];
-  const me=new MouseEvent('mousemove',{clientX:touch.clientX,clientY:touch.clientY,bubbles:true});
-  document.dispatchEvent(me);
-},{passive:false});
-
-document.addEventListener('touchend',e=>{
-  if(!isDragging&&!wallDragging) return;
-  const me=new MouseEvent('mouseup',{bubbles:true});
-  document.dispatchEvent(me);
-});
-
 document.getElementById('roomCanvas').addEventListener('mousedown',e=>{
   if(drawMode)return;
   const t=e.target;
@@ -2812,6 +2840,24 @@ function toggleSidebar(){
   btn.textContent=sb.classList.contains('collapsed')?'›':'‹';
   // Refit canvas after sidebar animates
   setTimeout(()=>fitZoom(),220);
+}
+
+// ─── PTZ MOVE PAD ────────────────────────────────────────────────
+let ptzStep=5; // pixels per tap
+function setPtzStep(px,btn){
+  ptzStep=px;
+  document.querySelectorAll('.ptz-step-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function ptzMove(dx,dy){
+  const item=items.find(i=>i.id===selected);
+  if(!item) return;
+  saveHistory();
+  const{W,H}=getCW();
+  const ed=getEffectiveDims(item);
+  item.x=Math.max(0,Math.min(item.x+dx*ptzStep, W-ed.w*SCALE));
+  item.y=Math.max(0,Math.min(item.y+dy*ptzStep, H-ed.h*SCALE));
+  renderItems();
 }
 // ─── INIT ─────────────────────────────────────────────────────────
 buildLibrary();
