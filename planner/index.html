@@ -2065,6 +2065,11 @@ function renderWalls(){
 
     document.getElementById('roomCanvas').appendChild(el);
   });
+  // Restore selected-wall highlight after DOM rebuild
+  if(selectedWallIdx>=0){
+    const els=document.getElementById('roomCanvas').querySelectorAll('.wall-elem');
+    if(els[selectedWallIdx]) els[selectedWallIdx].classList.add('selected-wall');
+  }
 }
 
 let wallDragging=false, wallDragIdx=-1, wallDragOx=0, wallDragOy=0;
@@ -2960,12 +2965,15 @@ function ptzMove(dx,dy){
   // Move selected wall if one is selected
   if(selectedWallIdx>=0 && selectedWallIdx<walls.length){
     saveHistory();
-    const{ox,oy}=getCW();
     const w=walls[selectedWallIdx];
-    const stepM=ptzStep/SCALE; // convert px step to metres
+    const stepM=ptzStep/SCALE;
     const b=getBounds();
-    w.px=Math.max(b.minX,Math.min(w.px+dx*stepM, b.maxX));
-    w.py=Math.max(b.minY,Math.min(w.py+dy*stepM, b.maxY));
+    const{wpx,hpx}=getWallDims(w);
+    // Clamp so wall stays fully within room bounds
+    const maxPx=b.maxX - wpx/SCALE;
+    const maxPy=b.maxY - hpx/SCALE;
+    w.px=Math.max(b.minX, Math.min(w.px+dx*stepM, maxPx));
+    w.py=Math.max(b.minY, Math.min(w.py+dy*stepM, maxPy));
     renderWalls();
     return;
   }
@@ -2986,7 +2994,11 @@ function togglePanel(){
   const btn=document.getElementById('panelCollapseBtn');
   panel.classList.toggle('panel-expanded');
   btn.textContent=panel.classList.contains('panel-expanded')?'▼':'▲';
-  // Refit canvas after animation
+  // Restore wall/furniture highlight after collapse
+  if(selectedWallIdx>=0){
+    const els=document.getElementById('roomCanvas').querySelectorAll('.wall-elem');
+    if(els[selectedWallIdx]) els[selectedWallIdx].classList.add('selected-wall');
+  }
   setTimeout(()=>centreCanvas(),270);
 }
 // ─── INIT ─────────────────────────────────────────────────────────
