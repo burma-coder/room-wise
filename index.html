@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RoomWise — Free Room Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #F5F0E8;
+      --warm-white: #FDFAF5;
+      --charcoal: #1E1E1A;
+      --terracotta: #C4663A;
+      --sage: #7A9E7E;
+      --sand: #D4B896;
+      --muted: #8A8578;
+      --border: #E2DBD0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--warm-white);
+      color: var(--charcoal);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: auto;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: rgba(253,250,245,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 0.8s ease both;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      color: var(--charcoal);
+      text-decoration: none;
+    }
+    .logo span { color: var(--terracotta); font-style: italic; }
+    nav ul { list-style: none; display: flex; gap: 2.2rem; align-items: center; }
+    nav ul a {
+      text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 400; letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--charcoal); }
+    .nav-cta {
+      background: var(--charcoal) !important;
+      color: var(--cream) !important;
+      padding: 0.55rem 1.4rem;
+      border-radius: 2px;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--terracotta) !important; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 3rem 4rem;
+      gap: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(196,102,58,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(122,158,126,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-text { position: relative; z-index: 2; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--terracotta);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block; width: 28px; height: 1px; background: var(--terracotta);
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.35s ease both;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 420px;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; align-items: center;
+      animation: fadeUp 0.8s 0.65s ease both;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--terracotta);
+      color: #fff;
+      padding: 0.85rem 2rem;
+      border: none; border-radius: 2px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: none;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .btn-primary:hover { background: #b05530; transform: translateY(-2px); }
+    .btn-secondary {
+      color: var(--charcoal);
+      font-size: 0.88rem; font-weight: 400;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      border-bottom: 1px solid var(--charcoal);
+      padding-bottom: 2px;
+      transition: color 0.2s;
+    }
+    .btn-secondary:hover { color: var(--terracotta); border-color: var(--terracotta); }
+    .hero-badge {
+      margin-top: 2rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.8rem; color: var(--muted);
+      animation: fadeUp 0.8s 0.8s ease both;
+    }
+    .hero-badge svg { color: var(--sage); }
+    .badge-pill {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      color: var(--sage);
+      font-weight: 500;
+    }
+
+    /* ROOM ILLUSTRATION */
+    .hero-visual {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn 1.2s 0.4s ease both;
+    }
+    .room-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+    }
+    .room-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(30,30,26,0.12), 0 4px 16px rgba(30,30,26,0.06);
+    }
+    .room-topbar {
+      background: var(--charcoal);
+      padding: 0.75rem 1rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .room-topbar-dots { display: flex; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #E06C75; }
+    .dot-y { background: #E5C07B; }
+    .dot-g { background: var(--sage); }
+    .room-topbar-label {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem; letter-spacing: 0.08em;
+    }
+    .room-canvas {
+      padding: 1.5rem;
+      background: #FAF7F2;
+      position: relative;
+    }
+    svg.floor-plan {
+      width: 100%; height: auto;
+      display: block;
+    }
+
+    /* Animated furniture pieces */
+    .furniture-sofa { animation: slideIn 0.9s 1.0s ease both; }
+    .furniture-table { animation: slideIn 0.9s 1.2s ease both; }
+    .furniture-bed { animation: slideIn 0.9s 1.4s ease both; }
+    .furniture-plant { animation: slideIn 0.9s 1.6s ease both; }
+    
+
+    .room-info-strip {
+      background: var(--charcoal);
+      padding: 0.85rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .room-dims { color: rgba(255,255,255,0.6); font-size: 0.78rem; }
+    .room-dims strong { color: #fff; font-weight: 500; }
+    
+    
+
+    /* Floating hints */
+    .float-hint {
+      position: absolute;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.5rem 0.8rem;
+      font-size: 0.72rem;
+      color: var(--charcoal);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .hint-1 { top: -16px; right: 30px; animation: floatHint 0.7s 2.2s ease both; }
+    .hint-2 { bottom: 60px; left: -20px; animation: floatHint 0.7s 2.5s ease both; }
+    .hint-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sage); }
+    .hint-dot-warn { background: #E5C07B; }
+
+    /* STATS STRIP */
+    .stats-strip {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex; gap: 0;
+      overflow: hidden;
+    }
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem 1rem;
+      border-right: 1px solid var(--border);
+      animation: fadeUp 0.6s ease both;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item:nth-child(1) { animation-delay: 0.1s; }
+    .stat-item:nth-child(2) { animation-delay: 0.2s; }
+    .stat-item:nth-child(3) { animation-delay: 0.3s; }
+    .stat-item:nth-child(4) { animation-delay: 0.4s; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--charcoal);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* HOW IT WORKS */
+    .section { padding: 6rem 3rem; }
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--terracotta);
+      margin-bottom: 0.75rem;
+    }
+    .section-tag::after { content: ''; display: block; width: 20px; height: 1px; background: var(--terracotta); }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+      max-width: 480px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 3.5rem;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .step-card {
+      background: var(--warm-white);
+      padding: 2.5rem;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .step-card:hover { background: var(--cream); }
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.04em;
+    }
+    .step-icon {
+      width: 44px; height: 44px;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .step-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .step-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+
+    /* FEATURES */
+    .features-section { 
+      padding: 6rem 3rem;
+      background: var(--charcoal);
+      color: var(--cream);
+    }
+    .features-section .section-tag { color: var(--sand); }
+    .features-section .section-tag::after { background: var(--sand); }
+    .features-section h2 { color: var(--cream); }
+    .features-section .section-sub { color: rgba(245,240,232,0.6); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5px;
+      margin-top: 3.5rem;
+      background: rgba(255,255,255,0.08);
+    }
+    .feature-item {
+      background: var(--charcoal);
+      padding: 2rem 2rem;
+      border: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.2s;
+      display: flex; gap: 1.2rem;
+    }
+    .feature-item:hover { background: #2a2a24; }
+    .feature-ico {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #fff;
+    }
+    .feature-desc { color: rgba(245,240,232,0.55); font-size: 0.88rem; line-height: 1.65; }
+
+    /* TESTIMONIALS */
+    .testimonials { padding: 6rem 3rem; background: var(--cream); }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .testi-card {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      border-radius: 2px;
+      position: relative;
+    }
+    .testi-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      color: var(--border);
+      line-height: 0.5;
+      margin-bottom: 1rem;
+    }
+    .testi-text {
+      font-size: 0.92rem;
+      line-height: 1.75;
+      color: var(--charcoal);
+      margin-bottom: 1.2rem;
+    }
+    .testi-author { display: flex; align-items: center; gap: 0.75rem; }
+    .testi-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--sand);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 500; color: var(--charcoal);
+    }
+    .testi-name { font-size: 0.82rem; font-weight: 500; }
+    .testi-loc { font-size: 0.75rem; color: var(--muted); }
+    .stars { color: var(--terracotta); font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 7rem 3rem;
+      text-align: center;
+      background: var(--warm-white);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(196,102,58,0.07) 0%, transparent 60%);
+    }
+    .cta-section h2 { font-size: clamp(2.2rem, 4vw, 3.2rem); position: relative; }
+    .cta-section p { color: var(--muted); margin: 1rem auto 2.5rem; max-width: 460px; font-size: 1rem; line-height: 1.7; position: relative; }
+    .cta-free-tag {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(122,158,126,0.15);
+      color: var(--sage);
+      border: 1px solid rgba(122,158,126,0.3);
+      padding: 0.3rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.78rem; font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--charcoal);
+      color: rgba(245,240,232,0.5);
+      padding: 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1.5rem;
+    }
+    footer .logo { color: var(--cream); font-size: 1.1rem; }
+    .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-links a { color: rgba(245,240,232,0.4); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--cream); }
+    .footer-copy { font-size: 0.78rem; width: 100%; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 1.5rem; margin-top: 0.5rem; }
+
+    /* ANIMATIONS */
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    @keyframes floatHint { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    .room-wrapper { animation: float 5s ease-in-out infinite; }
+
+    /* SCROLLED REVEAL */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding-top: 7rem; text-align: center; }
+      .hero-sub, .hero-badge { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .hero-eyebrow { margin: 0 auto 1.5rem; }
+      .steps-grid, .testi-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      nav { padding: 1rem 1.5rem; }
+      nav ul { display: none; }
+      .stats-strip { flex-wrap: wrap; }
+      .stat-item { flex: 1 1 40%; border-right: none; border-bottom: 1px solid var(--border); }
+    }
+
+    /* ── FEEDBACK SECTION ─────────────────────────────── */
+    .feedback-section {
+      background: var(--warm);
+      padding: 5rem 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .feedback-inner {
+      max-width: 580px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .feedback-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 0.75rem;
+    }
+    .feedback-inner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: var(--charcoal);
+      margin-bottom: 0.75rem;
+      line-height: 1.25;
+    }
+    .feedback-inner p {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .feedback-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      text-align: left;
+    }
+    .feedback-form input,
+    .feedback-form textarea {
+      width: 100%;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 3px;
+      padding: 0.75rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--charcoal);
+      transition: border-color 0.2s;
+      outline: none;
+      resize: vertical;
+    }
+    .feedback-form input:focus,
+    .feedback-form textarea:focus {
+      border-color: var(--terracotta);
+    }
+    .feedback-form textarea {
+      min-height: 120px;
+    }
+    .feedback-form input::placeholder,
+    .feedback-form textarea::placeholder {
+      color: #B8B0A8;
+    }
+    .feedback-submit {
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 3px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .feedback-submit:hover { background: var(--terracotta); }
+    .feedback-submit:disabled { background: #aaa; cursor: not-allowed; }
+    .feedback-success {
+      display: none;
+      background: #F0F7F1;
+      border: 1px solid rgba(122,158,126,0.4);
+      border-radius: 3px;
+      padding: 1rem;
+      font-size: 0.88rem;
+      color: #3A6040;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    .feedback-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+
+  <nav>
+    <a href="#" class="logo">Room<span>Wise</span></a>
+    <ul>
+      <li><a href="#how">How it Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#stories">Stories</a></li>
+      <li><a href="planner.html" class="nav-cta">Start Planning →</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Free Room Planner</div>
+      <h1>Your tiny room,<br/><em>brilliantly</em> arranged.</h1>
+      <p class="hero-sub">
+        Drag, drop, and design your perfect space. Stop guessing where your sofa goes — 
+        RoomWise shows you exactly how to make the most of every square metre.
+      </p>
+      <div class="hero-actions">
+        <a href="planner.html" class="btn-primary">Plan My Room — It's Free</a>
+        <a href="#how" class="btn-secondary">See how it works ↓</a>
+      </div>
+      <div class="hero-badge">
+        <span class="badge-pill">✓ No sign-up needed</span>
+        <span style="color: var(--border)">·</span>
+        <span class="badge-pill">✓ 100% free forever</span>
+        <span style="color: var(--border)">·</span>
+        <span class="badge-pill">✓ 100% Free</span>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="room-wrapper">
+        <!-- Floating UI hints -->
+        <div class="float-hint hint-1">
+          <div class="hint-dot"></div>
+          Great traffic flow! ✓
+        </div>
+        <div class="float-hint hint-2">
+          <div class="hint-dot hint-dot-warn"></div>
+          Try rotating the desk 90°
+        </div>
+
+        <div class="room-card">
+          <div class="room-topbar">
+            <div class="room-topbar-dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <span class="room-topbar-label">My Bedroom — 3.2m × 4.1m</span>
+          </div>
+          <div class="room-canvas">
+            <svg class="floor-plan" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+              <!-- Room outline -->
+              <rect x="20" y="20" width="360" height="280" fill="none" stroke="#C4B8A8" stroke-width="2.5" rx="1"/>
+              <!-- Grid lines -->
+              <g stroke="#EDE8E0" stroke-width="0.5">
+                <line x1="60" y1="20" x2="60" y2="300"/>
+                <line x1="100" y1="20" x2="100" y2="300"/>
+                <line x1="140" y1="20" x2="140" y2="300"/>
+                <line x1="180" y1="20" x2="180" y2="300"/>
+                <line x1="220" y1="20" x2="220" y2="300"/>
+                <line x1="260" y1="20" x2="260" y2="300"/>
+                <line x1="300" y1="20" x2="300" y2="300"/>
+                <line x1="340" y1="20" x2="340" y2="300"/>
+                <line x1="20" y1="60" x2="380" y2="60"/>
+                <line x1="20" y1="100" x2="380" y2="100"/>
+                <line x1="20" y1="140" x2="380" y2="140"/>
+                <line x1="20" y1="180" x2="380" y2="180"/>
+                <line x1="20" y1="220" x2="380" y2="220"/>
+                <line x1="20" y1="260" x2="380" y2="260"/>
+              </g>
+              <!-- Window -->
+              <rect x="130" y="18" width="80" height="6" fill="#A8C4D8" rx="1"/>
+              <line x1="170" y1="18" x2="170" y2="24" stroke="#fff" stroke-width="1.5"/>
+              <text x="170" y="14" text-anchor="middle" font-size="8" fill="#8A8578" font-family="DM Sans">window</text>
+              <!-- Door arc -->
+              <path d="M20 240 Q60 240 60 200" fill="none" stroke="#C4B8A8" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <rect x="18" y="200" width="4" height="40" fill="#7A9E7E"/>
+              <text x="50" y="248" text-anchor="middle" font-size="8" fill="#8A8578" font-family="DM Sans">door</text>
+
+              <!-- BED (large, against top wall) -->
+              <g class="furniture-bed">
+                <rect x="200" y="30" width="160" height="100" fill="#D4B896" rx="3"/>
+                <rect x="200" y="30" width="160" height="22" fill="#C4A882" rx="3"/>
+                <rect x="210" y="35" width="60" height="12" fill="#B89068" rx="2"/>
+                <rect x="280" y="35" width="60" height="12" fill="#B89068" rx="2"/>
+                <text x="280" y="88" text-anchor="middle" font-size="9" fill="#8A6840" font-family="DM Sans" font-weight="500">Bed</text>
+              </g>
+
+              <!-- DESK (right wall) -->
+              <g class="furniture-table">
+                <rect x="340" y="140" width="38" height="80" fill="#C4A882" rx="2"/>
+                <rect x="344" y="145" width="30" height="20" fill="#A08060" rx="1"/>
+                <text x="359" y="208" text-anchor="middle" font-size="8" fill="#8A6840" font-family="DM Sans" font-weight="500">Desk</text>
+              </g>
+
+              <!-- WARDROBE -->
+              <g class="furniture-sofa">
+                <rect x="30" y="30" width="90" height="45" fill="#B8C4B0" rx="2"/>
+                <line x1="75" y1="30" x2="75" y2="75" stroke="#A0B098" stroke-width="1"/>
+                <text x="75" y="88" text-anchor="middle" font-size="8" fill="#6A8068" font-family="DM Sans" font-weight="500">Wardrobe</text>
+              </g>
+
+              <!-- SIDE TABLE -->
+              <g class="furniture-plant">
+                <circle cx="185" cy="58" r="16" fill="#E8D8C4"/>
+                <circle cx="185" cy="58" r="10" fill="#D4C4B0"/>
+                <text x="185" y="85" text-anchor="middle" font-size="7" fill="#8A8578" font-family="DM Sans">Side table</text>
+              </g>
+
+              <!-- CHAIR -->
+              <g>
+                <rect x="90" y="160" width="50" height="50" fill="#C4B8D4" rx="3"/>
+                <rect x="90" y="160" width="50" height="12" fill="#B4A8C4" rx="2"/>
+                <text x="115" y="228" text-anchor="middle" font-size="8" fill="#7A6888" font-family="DM Sans" font-weight="500">Chair</text>
+              </g>
+
+
+
+              <!-- Measurement lines -->
+              <line x1="20" y1="310" x2="380" y2="310" stroke="#C4B8A8" stroke-width="1"/>
+              <line x1="20" y1="306" x2="20" y2="314" stroke="#C4B8A8" stroke-width="1"/>
+              <line x1="380" y1="306" x2="380" y2="314" stroke="#C4B8A8" stroke-width="1"/>
+              <text x="200" y="318" text-anchor="middle" font-size="8" fill="#8A8578" font-family="DM Sans">4.1 metres</text>
+            </svg>
+          </div>
+          <div class="room-info-strip">
+            <span class="room-dims">Room: <strong>3.2m × 4.1m</strong> · 4 items placed</span>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-item reveal">
+      <div class="stat-num">12k+</div>
+      <div class="stat-label">Rooms planned this month</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">4.8★</div>
+      <div class="stat-label">Average user rating</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Free, no credit card</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">3 min</div>
+      <div class="stat-label">Average time to first layout</div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="section-tag">How it works</div>
+    <h2>Three steps to a<br/>room you'll love</h2>
+    <p class="section-sub">No design experience needed. RoomWise guides you from a blank floor plan to a smart, optimised layout in minutes.</p>
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-num">01</div>
+        <div class="step-icon">📐</div>
+        <div class="step-title">Enter your room size</div>
+        <p class="step-desc">Type in your room dimensions and mark where your windows and doors are. Takes 30 seconds.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">02</div>
+        <div class="step-icon">🛋️</div>
+        <div class="step-title">Drag in your furniture</div>
+        <p class="step-desc">Pick from 50+ furniture items — beds, sofas, tables, appliances and more — all with real dimensions. Drag them onto your floor plan and see exactly how they fit.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">03</div>
+        <div class="step-icon">💡</div>
+        <div class="step-title">Get smart tips</div>
+        <p class="step-desc">Built-in design tips help you think about traffic flow, natural light, and spacing — so every decision makes sense.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <div class="section-tag">Features</div>
+    <h2>Everything a small-space<br/>dweller needs</h2>
+    <p class="section-sub">Thoughtfully built for apartments, studios, shared houses — anywhere every centimetre counts.</p>
+    <div class="features-grid">
+      <div class="feature-item reveal">
+        <div class="feature-ico">🏠</div>
+        <div>
+          <div class="feature-title">2D Floor Plan Builder</div>
+          <p class="feature-desc">Draw your room to scale with an intuitive grid. Mark walls, windows, doors, and alcoves precisely.</p>
+        </div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-ico">🛋️</div>
+        <div>
+          <div class="feature-title">Real-size Furniture Library</div>
+          <p class="feature-desc">50+ furniture pieces with accurate real-world dimensions. If it doesn't fit on screen, it won't fit in your room.</p>
+        </div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-ico">📐</div>
+        <div>
+          <div class="feature-title">Smart Layout Tips</div>
+          <p class="feature-desc">Built-in design guidance helps you think about ergonomics, traffic flow, and natural light — in plain English.</p>
+        </div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-ico">⚠️</div>
+        <div>
+          <div class="feature-title">Smart Clash Warnings</div>
+          <p class="feature-desc">"Your door swings into the wardrobe." Real-time warnings catch layout mistakes before you move a single piece of furniture.</p>
+        </div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-ico">🔗</div>
+        <div>
+          <div class="feature-title">Shop Your Layout</div>
+          <p class="feature-desc">Every piece of furniture links to affordable options at IKEA, Wayfair, and more. Design it, then buy it.</p>
+        </div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-ico">📤</div>
+        <div>
+          <div class="feature-title">Save & Share</div>
+          <p class="feature-desc">Export your floor plan as a PDF. Share it with a flatmate, partner, or removal company. No account required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="stories">
+    <div class="section-tag">Real stories</div>
+    <h2>People who found<br/>their perfect layout</h2>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"</div>
+        <p class="testi-text">I'd been living with my sofa blocking the window for two years. RoomWise showed me a completely different arrangement in 5 minutes. Life-changing for a tiny flat.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">SL</div>
+          <div>
+            <div class="testi-name">Sophie L.</div>
+            <div class="testi-loc">Studio apartment, London</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"</div>
+        <p class="testi-text">The overlap warning saved me from buying a dining table that literally would not have fit. I didn't realise the door swing ate up so much space.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MK</div>
+          <div>
+            <div class="testi-name">Marco K.</div>
+            <div class="testi-loc">1-bedroom apartment, Sydney</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"</div>
+        <p class="testi-text">Finally a free tool that doesn't feel cheap. The furniture library has everything with actual measurements. I planned my whole flat move in one evening.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">AR</div>
+          <div>
+            <div class="testi-name">Aisha R.</div>
+            <div class="testi-loc">Shared house, Manchester</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="planner">
+    <div class="cta-free-tag">✓ Completely free · No account needed</div>
+    <h2>Your best room is<br/><em>one plan away.</em></h2>
+    <p>Join thousands of people who stopped guessing and started living in rooms that actually work for them.</p>
+    <a href="planner.html" class="btn-primary" style="font-size: 1rem; padding: 1rem 2.5rem;">Start Planning My Room →</a>
+  </section>
+
+
+  <!-- FEEDBACK / SUGGESTIONS -->
+  <section class="feedback-section" id="feedback">
+    <div class="feedback-inner reveal">
+      <div class="feedback-eyebrow">We'd love to hear from you</div>
+      <h2>Help us make RoomWise<br/><em>better for you</em></h2>
+      <p>Got a feature idea? Something not working right? Or just want to say hi? Drop us a note — every message is read personally.</p>
+
+      <form class="feedback-form" id="feedbackForm">
+        <input type="hidden" name="access_key" value="5ee0e683-bb20-4baf-908d-971a82d0f45b"/>
+        <input type="hidden" name="subject" value="RoomWise Feedback"/>
+        <input type="hidden" name="from_name" value="RoomWise Feedback Form"/>
+        <input type="checkbox" name="botcheck" style="display:none"/>
+        <input
+          type="email"
+          name="email"
+          id="feedbackEmail"
+          placeholder="Your email (optional — only if you want a reply)"
+          autocomplete="email"
+        />
+        <textarea
+          name="message"
+          id="feedbackMsg"
+          placeholder="Your suggestion, idea, or feedback…"
+          required
+        ></textarea>
+        <button type="submit" class="feedback-submit" id="feedbackBtn">Send Feedback →</button>
+        <p class="feedback-note">Your feedback goes directly to the RoomWise team. No spam, ever.</p>
+      </form>
+
+      <div class="feedback-success" id="feedbackSuccess">
+        ✓ Thanks so much! Your feedback has been sent. We really appreciate it.
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="#" class="logo">Room<span style="color:var(--terracotta);font-style:italic">Wise</span></a>
+    <div class="footer-links">
+      <a href="#">How it Works</a>
+      <a href="#">Features</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="footer-copy">© 2026 RoomWise. Free forever for personal use. Made with care for people in small spaces.</div>
+  </footer>
+
+  <script>
+
+    // Feedback form — Web3Forms
+    document.getElementById('feedbackForm').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const btn = document.getElementById('feedbackBtn');
+      const msg = document.getElementById('feedbackMsg').value.trim();
+      if(!msg) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      try {
+        const formData = new FormData(this);
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if(data.success){
+          document.getElementById('feedbackForm').style.display = 'none';
+          document.getElementById('feedbackSuccess').style.display = 'block';
+        } else {
+          alert('Something went wrong. Please try again.');
+          btn.disabled = false;
+          btn.textContent = 'Send Feedback →';
+        }
+      } catch(err){
+        alert('Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Send Feedback →';
+      }
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => observer.observe(r));
+  </script>
+</body>
+</html>
