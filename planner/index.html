@@ -145,11 +145,9 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
 
 /* ── MOBILE RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 768px){
-  /* Remove overflow hidden on mobile so PTZ and content are visible */
-  html,body{overflow:auto!important;}
-  .app-body{overflow:visible!important;}
-  .sidebar-left{overflow:visible!important;}
-  .sidebar-right{overflow:visible!important;}
+  /* Restore overflow hidden on mobile */
+  html,body{overflow:hidden!important;}
+  .app-body{overflow:hidden!important;}
   .topbar{padding:0 0.6rem;height:48px;overflow-x:auto;}
   .top-tools{gap:0.25rem;}
   .tool-btn{padding:0.28rem 0.5rem;font-size:0.7rem;}
@@ -249,16 +247,26 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
   /* Canvas takes middle space */
   .canvas-area{flex:1;min-height:0;overflow:auto;}
 
-  /* Right panel becomes a bottom sheet */
+  /* Right panel — minimised by default on mobile, expandable */
   .sidebar-right{
-    width:100%;height:200px;flex-shrink:0;
+    width:100%;height:36px;flex-shrink:0;
     border-left:none;border-top:1px solid var(--border);
     flex-direction:column;overflow:hidden;
+    transition:height 0.25s ease;
   }
-  .panel-tabs{flex-shrink:0;height:34px;}
-  .panel-tab{padding:0.45rem 0.35rem!important;font-size:0.66rem!important;}
+  .sidebar-right.panel-expanded{
+    height:200px;
+  }
+  .panel-tabs{flex-shrink:0;height:36px;display:flex;}
+  .panel-tab{padding:0.4rem 0.35rem!important;font-size:0.66rem!important;}
+  .panel-collapse-btn{
+    margin-left:auto;padding:0.4rem 0.7rem!important;
+    font-size:0.8rem!important;color:var(--muted)!important;
+    border-bottom:none!important;
+  }
+  .sidebar-right.panel-expanded .panel-collapse-btn{transform:rotate(180deg);}
   .panel-content{padding:0.5rem;flex:1;overflow-y:auto;display:block!important;}
-  .warn-strip{font-size:0.67rem;padding:0.25rem 0.6rem;min-height:22px;flex-shrink:0;}
+  .warn-strip{display:none!important;}
 
   /* Modal full screen on mobile */
   .modal{width:100%;max-width:100%;max-height:100vh;border-radius:0;padding:1.2rem;}
@@ -529,10 +537,11 @@ kbd{background:var(--border);padding:1px 5px;border-radius:2px;font-size:0.73rem
   </div>
 
   <!-- RIGHT -->
-  <div class="sidebar-right">
+  <div class="sidebar-right" id="sidebarRight">
     <div class="panel-tabs">
       <div class="panel-tab active" id="tabProps" onclick="switchTab('props')">Properties</div>
       <div class="panel-tab" id="tabInfo" onclick="switchTab('info')">Tips</div>
+      <div class="panel-tab panel-collapse-btn" id="panelCollapseBtn" onclick="togglePanel()" title="Minimise panel">▼</div>
     </div>
     <div class="panel-content" id="panelProps">
       <div class="prop-empty" id="propEmpty"><p>Click any furniture on the canvas to edit its size, position, and colour.</p></div>
@@ -2224,9 +2233,23 @@ function selectItem(id){
     switchTab('props');
     const hint=document.getElementById('ptzHint');
     if(hint){const item=items.find(i=>i.id===id);hint.textContent=item?item.label:'selected';}
+    // Auto-expand panel on mobile when item selected
+    const panel=document.getElementById('sidebarRight');
+    if(panel&&window.innerWidth<=768){
+      panel.classList.add('panel-expanded');
+      const btn=document.getElementById('panelCollapseBtn');
+      if(btn) btn.textContent='▼';
+    }
   } else {
     const hint=document.getElementById('ptzHint');
     if(hint) hint.textContent='← tap item to move';
+    // Collapse panel on mobile when deselected
+    const panel=document.getElementById('sidebarRight');
+    if(panel&&window.innerWidth<=768){
+      panel.classList.remove('panel-expanded');
+      const btn=document.getElementById('panelCollapseBtn');
+      if(btn) btn.textContent='▲';
+    }
   }
 }
 
@@ -2908,6 +2931,16 @@ function ptzMove(dx,dy){
   item.x=Math.max(0,Math.min(item.x+dx*ptzStep, W-ed.w*SCALE));
   item.y=Math.max(0,Math.min(item.y+dy*ptzStep, H-ed.h*SCALE));
   renderItems();
+}
+
+// ─── PANEL COLLAPSE (mobile) ──────────────────────────────────────
+function togglePanel(){
+  const panel=document.getElementById('sidebarRight');
+  const btn=document.getElementById('panelCollapseBtn');
+  panel.classList.toggle('panel-expanded');
+  btn.textContent=panel.classList.contains('panel-expanded')?'▼':'▲';
+  // Refit canvas after animation
+  setTimeout(()=>centreCanvas(),270);
 }
 // ─── INIT ─────────────────────────────────────────────────────────
 buildLibrary();
