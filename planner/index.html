@@ -280,6 +280,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
   .modal{width:100%;max-width:100%;max-height:100vh;border-radius:0;padding:1.2rem;}
   .template-grid{grid-template-columns:repeat(3,1fr);gap:0.4rem;}
   .zoom-controls{bottom:44px;}
+  #zoomFit{background:var(--terra)!important;color:#fff!important;font-weight:700;padding:0.15rem 0.55rem!important;border-radius:3px;}
 }
 
 @media (max-width: 480px){
@@ -2535,7 +2536,8 @@ document.getElementById('btnExport').addEventListener('click', async ()=>{
 
 // ─── ZOOM ────────────────────────────────────────────────────────
 function setZoom(s){
-  SCALE=Math.max(20,Math.min(220,s));
+  const minScale=window.innerWidth<=768?8:20;
+  SCALE=Math.max(minScale,Math.min(220,s));
   document.getElementById('zoomLabel').textContent=Math.round(SCALE/60*100)+'%';
   renderCanvas();renderWalls();renderItems();
   centreCanvas();
@@ -2568,12 +2570,14 @@ function fitZoom(){
     const roomW=b.maxX-b.minX, roomH=b.maxY-b.minY;
     if(!roomW||!roomH) return;
     const RULER=window._RULER||28;
-    const padding=40;
+    const padding=window.innerWidth<=768?12:40;
     const s=Math.floor(Math.min(
       (aW - RULER*2 - padding) / roomW,
       (aH - RULER*2 - padding) / roomH
     ));
-    setZoom(Math.max(20, s));
+    // On mobile allow smaller zoom so large rooms always fit
+    const minZ=window.innerWidth<=768?8:20;
+    setZoom(Math.max(minZ, s));
     // Centre the room in the canvas area using margin on the canvas element
     requestAnimationFrame(()=>{
       const canvas=document.getElementById('roomCanvas');
