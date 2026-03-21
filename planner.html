@@ -180,6 +180,67 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
   .furn-dims{display:none;}
   .furn-name{font-size:0.62rem;text-align:center;line-height:1.1;white-space:normal;max-width:52px;}
 
+  /* PTZ strip between furniture and canvas */
+  .ptz-row{
+    display:flex!important;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    padding:4px 10px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    width:100%;
+    flex-shrink:0;
+    order:0;
+    z-index:10;
+    box-shadow:0 2px 6px rgba(0,0,0,0.06);
+  }
+  .ptz-grid{
+    display:grid;
+    grid-template-columns:repeat(3,38px);
+    grid-template-rows:repeat(3,38px);
+    gap:2px;
+  }
+  .ptz-btn{
+    width:38px;height:38px;
+    background:#fff;
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    font-size:1.1rem;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:var(--charcoal);
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;touch-action:manipulation;
+    box-shadow:0 1px 3px rgba(0,0,0,0.1);
+  }
+  .ptz-btn:active{background:var(--terra)!important;color:#fff!important;border-color:var(--terra)!important;}
+  .ptz-empty{width:38px;height:38px;background:transparent;}
+  .ptz-centre{
+    width:38px;height:38px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.1rem;color:var(--terra);
+    background:rgba(196,102,58,0.08);
+    border-radius:8px;
+    border:1.5px solid rgba(196,102,58,0.3);
+  }
+  .ptz-steps{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+  }
+  .ptz-label{font-size:0.6rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:1px;}
+  .ptz-step-btn{
+    width:34px;padding:4px 0;font-size:0.72rem;font-weight:600;
+    background:#fff;border:1.5px solid var(--border);
+    border-radius:5px;cursor:pointer;color:var(--muted);
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  .ptz-step-btn.active{background:var(--terra);color:#fff;border-color:var(--terra);}
+  .ptz-hint{
+    font-size:0.62rem;color:var(--muted);
+    text-align:center;max-width:60px;line-height:1.3;
+  }
+
   /* Canvas takes middle space */
   .canvas-area{flex:1;min-height:0;overflow:auto;}
 
@@ -209,65 +270,8 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
 }
 
 /* ── PTZ Move Pad (mobile only) ─────────────────────────────── */
-.ptz-row{display:none;}
-@media(max-width:768px){
-  .ptz-row{
-    display:flex;
-    flex-direction:row;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    padding:5px 8px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
-    flex-shrink:0;
-    overflow:visible;
-  }
-  .ptz-grid{
-    display:grid;
-    grid-template-columns:repeat(3,34px);
-    grid-template-rows:repeat(3,34px);
-    gap:2px;
-  }
-  .ptz-btn{
-    width:34px;height:34px;
-    background:#fff;
-    border:1.5px solid var(--border);
-    border-radius:6px;
-    font-size:1rem;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;color:var(--charcoal);
-    -webkit-tap-highlight-color:transparent;
-    user-select:none;touch-action:manipulation;
-  }
-  .ptz-btn:active,.ptz-btn:focus{background:var(--terra);color:#fff;border-color:var(--terra);outline:none;}
-  .ptz-empty{width:34px;height:34px;background:transparent;}
-  .ptz-centre{
-    width:34px;height:34px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.1rem;color:var(--terra);opacity:0.7;
-  }
-  .ptz-steps{
-    display:flex;flex-direction:column;align-items:center;gap:4px;
-  }
-  .ptz-label{font-size:0.62rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;}
-  .ptz-step-btn{
-    width:32px;padding:4px 0;font-size:0.72rem;font-weight:500;
-    background:#fff;border:1.5px solid var(--border);
-    border-radius:4px;cursor:pointer;color:var(--muted);
-    -webkit-tap-highlight-color:transparent;
-    touch-action:manipulation;
-  }
-  .ptz-step-btn.active{background:var(--terra);color:#fff;border-color:var(--terra);}
-  .ptz-hint{
-    font-size:0.65rem;color:var(--muted);
-    writing-mode:vertical-lr;
-    text-orientation:mixed;
-    opacity:0.7;
-    max-height:80px;
-    line-height:1.2;
-  }
-}
+/* PTZ hidden on desktop */
+.ptz-row{display:none!important;}
 /* Print / PDF styles */
 @media print{
   body{overflow:visible!important;}
