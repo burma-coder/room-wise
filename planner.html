@@ -145,6 +145,11 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
 
 /* ── MOBILE RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 768px){
+  /* Remove overflow hidden on mobile so PTZ and content are visible */
+  html,body{overflow:auto!important;}
+  .app-body{overflow:visible!important;}
+  .sidebar-left{overflow:visible!important;}
+  .sidebar-right{overflow:visible!important;}
   .topbar{padding:0 0.6rem;height:48px;overflow-x:auto;}
   .top-tools{gap:0.25rem;}
   .tool-btn{padding:0.28rem 0.5rem;font-size:0.7rem;}
