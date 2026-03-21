@@ -208,39 +208,65 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
   .tool-btn{padding:0.28rem 0.4rem;}
 }
 
-/* ── PTZ Move Pad (mobile) ──────────────────────────────────── */
-.ptz-pad{display:none;}
+/* ── PTZ Move Pad (mobile only) ─────────────────────────────── */
+.ptz-row{display:none;}
 @media(max-width:768px){
-  .ptz-pad{
+  .ptz-row{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:5px 8px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+    overflow:visible;
+  }
+  .ptz-grid{
     display:grid;
-    grid-template-columns:repeat(3,36px);
-    grid-template-rows:repeat(3,36px);
-    gap:3px;
-    margin:8px auto 4px;
-    width:fit-content;
+    grid-template-columns:repeat(3,34px);
+    grid-template-rows:repeat(3,34px);
+    gap:2px;
   }
   .ptz-btn{
-    width:36px;height:36px;
-    background:var(--panel);
+    width:34px;height:34px;
+    background:#fff;
     border:1.5px solid var(--border);
     border-radius:6px;
     font-size:1rem;
     display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    color:var(--charcoal);
+    cursor:pointer;color:var(--charcoal);
     -webkit-tap-highlight-color:transparent;
-    user-select:none;
+    user-select:none;touch-action:manipulation;
   }
-  .ptz-btn:active{background:var(--terra);color:#fff;border-color:var(--terra);}
-  .ptz-btn.ptz-empty{background:transparent;border:none;pointer-events:none;}
-  .ptz-step-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;}
+  .ptz-btn:active,.ptz-btn:focus{background:var(--terra);color:#fff;border-color:var(--terra);outline:none;}
+  .ptz-empty{width:34px;height:34px;background:transparent;}
+  .ptz-centre{
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.1rem;color:var(--terra);opacity:0.7;
+  }
+  .ptz-steps{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+  }
+  .ptz-label{font-size:0.62rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;}
   .ptz-step-btn{
-    padding:3px 10px;font-size:0.7rem;
-    background:var(--panel);border:1px solid var(--border);
+    width:32px;padding:4px 0;font-size:0.72rem;font-weight:500;
+    background:#fff;border:1.5px solid var(--border);
     border-radius:4px;cursor:pointer;color:var(--muted);
     -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
   }
   .ptz-step-btn.active{background:var(--terra);color:#fff;border-color:var(--terra);}
+  .ptz-hint{
+    font-size:0.65rem;color:var(--muted);
+    writing-mode:vertical-lr;
+    text-orientation:mixed;
+    opacity:0.7;
+    max-height:80px;
+    line-height:1.2;
+  }
 }
 /* Print / PDF styles */
 @media print{
@@ -457,6 +483,28 @@ kbd{background:var(--border);padding:1px 5px;border-radius:2px;font-size:0.73rem
   </div>
 
   <!-- CANVAS -->
+
+  <!-- PTZ Move Pad — sits between furniture strip and canvas, mobile only -->
+  <div class="ptz-row" id="ptzRow">
+    <div class="ptz-grid" id="ptzPad">
+      <div class="ptz-empty"></div>
+      <button class="ptz-btn" ontouchstart="e=>{e.preventDefault();ptzMove(0,-1)}" onclick="ptzMove(0,-1)">▲</button>
+      <div class="ptz-empty"></div>
+      <button class="ptz-btn" ontouchstart="e=>{e.preventDefault();ptzMove(-1,0)}" onclick="ptzMove(-1,0)">◀</button>
+      <div class="ptz-centre">✥</div>
+      <button class="ptz-btn" ontouchstart="e=>{e.preventDefault();ptzMove(1,0)}" onclick="ptzMove(1,0)">▶</button>
+      <div class="ptz-empty"></div>
+      <button class="ptz-btn" ontouchstart="e=>{e.preventDefault();ptzMove(0,1)}" onclick="ptzMove(0,1)">▼</button>
+      <div class="ptz-empty"></div>
+    </div>
+    <div class="ptz-steps">
+      <span class="ptz-label">Step</span>
+      <button class="ptz-step-btn active" onclick="setPtzStep(5,this)">S</button>
+      <button class="ptz-step-btn" onclick="setPtzStep(15,this)">M</button>
+      <button class="ptz-step-btn" onclick="setPtzStep(30,this)">L</button>
+    </div>
+    <div class="ptz-hint" id="ptzHint">← tap item to move</div>
+  </div>
   <div class="canvas-area" id="canvasArea">
     <div class="canvas-bg"></div>
     <div id="roomCanvas"></div>
@@ -480,26 +528,7 @@ kbd{background:var(--border);padding:1px 5px;border-radius:2px;font-size:0.73rem
     <div class="panel-content" id="panelProps">
       <div class="prop-empty" id="propEmpty"><p>Click any furniture on the canvas to edit its size, position, and colour.</p></div>
       <div id="propEditor" style="display:none"></div>
-      <!-- PTZ move pad — visible on mobile only -->
-      <div class="ptz-pad" id="ptzPad">
-        <div class="ptz-step-row" style="grid-column:1/-1;display:flex;">
-          <span style="font-size:0.7rem;color:var(--muted);">Step:</span>
-          <button class="ptz-step-btn active" data-step="5" onclick="setPtzStep(5,this)">S</button>
-          <button class="ptz-step-btn" data-step="15" onclick="setPtzStep(15,this)">M</button>
-          <button class="ptz-step-btn" data-step="30" onclick="setPtzStep(30,this)">L</button>
-        </div>
-        <div class="ptz-btn ptz-empty"></div>
-        <button class="ptz-btn" ontouchstart="ptzMove(0,-1)" onclick="ptzMove(0,-1)">▲</button>
-        <div class="ptz-btn ptz-empty"></div>
-        <button class="ptz-btn" ontouchstart="ptzMove(-1,0)" onclick="ptzMove(-1,0)">◀</button>
-        <div class="ptz-btn ptz-empty" style="background:rgba(196,102,58,0.08);border-radius:50%;border:1.5px solid var(--terra);">
-          <span style="font-size:0.55rem;color:var(--terra);font-weight:600;">MOVE</span>
-        </div>
-        <button class="ptz-btn" ontouchstart="ptzMove(1,0)" onclick="ptzMove(1,0)">▶</button>
-        <div class="ptz-btn ptz-empty"></div>
-        <button class="ptz-btn" ontouchstart="ptzMove(0,1)" onclick="ptzMove(0,1)">▼</button>
-        <div class="ptz-btn ptz-empty"></div>
-      </div>
+
     </div>
     <div class="panel-content" id="panelInfo" style="display:none">
       <p style="font-family:'Playfair Display',serif;font-size:0.92rem;font-weight:700;margin-bottom:0.65rem;">Design Tips</p>
@@ -2178,7 +2207,19 @@ document.getElementById('roomCanvas').addEventListener('mousedown',e=>{
 });
 
 function snap(v){return Math.round(v/(SCALE/4))*(SCALE/4);}
-function selectItem(id){if(drawMode)return;selected=id;renderItems();if(id)switchTab('props');}
+function selectItem(id){
+  if(drawMode)return;
+  selected=id;
+  renderItems();
+  if(id){
+    switchTab('props');
+    const hint=document.getElementById('ptzHint');
+    if(hint){const item=items.find(i=>i.id===id);hint.textContent=item?item.label:'selected';}
+  } else {
+    const hint=document.getElementById('ptzHint');
+    if(hint) hint.textContent='← tap item to move';
+  }
+}
 
 // ─── DRAW MODE ────────────────────────────────────────────────────
 function enterDrawMode(){
