@@ -2281,7 +2281,7 @@ document.getElementById('roomCanvas').addEventListener('mousedown',e=>{
   }
 });
 
-function snap(v){return Math.round(v/(SCALE/4))*(SCALE/4);}
+function snap(v){const grid=Math.max(1,Math.round(SCALE*0.05));return Math.round(v/grid)*grid;}
 function selectItem(id){
   if(drawMode)return;
   selected=id;
