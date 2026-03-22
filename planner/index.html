@@ -307,6 +307,50 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
 /* ── PTZ Move Pad (mobile only) ─────────────────────────────── */
 /* PTZ hidden on desktop only */
 @media(min-width:769px){.ptz-row{display:none!important;}}
+
+/* ── Mobile onboarding tip ───────────────────────────────────── */
+.mobile-tip{display:none;}
+@media(max-width:768px){
+  .mobile-tip{
+    display:flex;
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(30,30,26,0.88);
+    color:#fff;
+    border-radius:12px;
+    padding:1.2rem 1.4rem;
+    flex-direction:column;
+    align-items:center;
+    gap:0.6rem;
+    z-index:50;
+    max-width:260px;
+    text-align:center;
+    backdrop-filter:blur(6px);
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+    pointer-events:all;
+    animation:tipFadeIn 0.4s ease both;
+  }
+  .mobile-tip.hidden{display:none!important;}
+  .mobile-tip-icon{font-size:2rem;}
+  .mobile-tip-title{font-size:0.95rem;font-weight:700;font-family:'DM Sans',sans-serif;color:#fff;}
+  .mobile-tip-text{font-size:0.8rem;font-family:'DM Sans',sans-serif;color:rgba(255,255,255,0.8);line-height:1.5;}
+  .mobile-tip-btn{
+    margin-top:0.3rem;
+    background:var(--terra);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:0.5rem 1.4rem;
+    font-size:0.85rem;
+    font-family:'DM Sans',sans-serif;
+    font-weight:600;
+    cursor:pointer;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  @keyframes tipFadeIn{from{opacity:0;transform:translate(-50%,-44%)}to{opacity:1;transform:translate(-50%,-50%)}}
+}
 /* Print / PDF styles */
 @media print{
   body{overflow:visible!important;}
@@ -554,6 +598,16 @@ kbd{background:var(--border);padding:1px 5px;border-radius:2px;font-size:0.73rem
   </div>
   <div class="canvas-area" id="canvasArea">
     <div class="canvas-bg"></div>
+    <!-- Mobile onboarding tip -->
+    <div class="mobile-tip" id="mobileTip">
+      <div class="mobile-tip-icon">🛋️</div>
+      <div class="mobile-tip-title">How to place furniture</div>
+      <div class="mobile-tip-text">
+        Press &amp; hold any item in the furniture strip above, then drag it onto the canvas.<br/><br/>
+        Use the <strong>▲▼◀▶</strong> arrows below to move a selected item precisely.
+      </div>
+      <button class="mobile-tip-btn" onclick="dismissTip()">Got it!</button>
+    </div>
     <div id="roomCanvas"></div>
     <div class="mode-banner" id="modeBanner">✏️ Click canvas corners to draw — click the first orange dot to finish</div>
     <div class="measure-tip" id="measureTip"></div>
@@ -3028,6 +3082,23 @@ function togglePanel(){
   }
   setTimeout(()=>centreCanvas(),270);
 }
+
+// ─── MOBILE ONBOARDING TIP ────────────────────────────────────────
+function dismissTip(){
+  const tip=document.getElementById('mobileTip');
+  if(tip) tip.classList.add('hidden');
+  // Remember dismissed so it doesn't show again
+  try{ localStorage.setItem('rw_tip_dismissed','1'); }catch(e){}
+}
+function initMobileTip(){
+  // Only show on mobile and only if not dismissed before
+  if(window.innerWidth>768) return;
+  try{ if(localStorage.getItem('rw_tip_dismissed')) return; }catch(e){}
+  // Don't show if loading from a shared link
+  if(window.location.hash.includes('layout=')) return;
+  const tip=document.getElementById('mobileTip');
+  if(tip) tip.classList.remove('hidden');
+}
 // ─── INIT ─────────────────────────────────────────────────────────
 buildLibrary();
 renderCanvas();
@@ -3036,6 +3107,8 @@ setTimeout(()=>{
     // New user — show room shape chooser on load
     openModal();
   }
+  // Show mobile onboarding tip
+  setTimeout(initMobileTip, 800);
 },100);
 </script>
 </body>
