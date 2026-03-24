@@ -521,6 +521,67 @@
       .stat-item { flex: 1 1 40%; border-right: none; border-bottom: 1px solid var(--border); }
     }
 
+
+    /* ── Founder story ───────────────────────────────────────────── */
+    .founder-story {
+      padding: 5rem 3rem;
+      background: var(--warm);
+      border-bottom: 1px solid var(--border);
+    }
+    .founder-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      gap: 3rem;
+      align-items: flex-start;
+    }
+    .founder-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--terracotta);
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Playfair Display', serif;
+    }
+    .founder-content {}
+    .founder-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 0.6rem;
+    }
+    .founder-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+      color: var(--charcoal);
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+    .founder-content p {
+      font-size: 0.95rem;
+      color: #4A4640;
+      line-height: 1.8;
+      margin-bottom: 0.85rem;
+    }
+    .founder-sig {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--terracotta);
+      margin-top: 1.2rem;
+    }
+    @media (max-width: 640px) {
+      .founder-inner { flex-direction: column; gap: 1.2rem; }
+      .founder-story { padding: 3.5rem 1.5rem; }
+    }
     /* ── FEEDBACK SECTION ─────────────────────────────── */
     .feedback-section {
       background: var(--warm);
@@ -866,6 +927,28 @@
   </section>
 
   <!-- TESTIMONIALS -->
+
+  <!-- FOUNDER STORY -->
+  <section class="founder-story">
+    <div class="founder-inner reveal">
+      <div class="founder-avatar">R</div>
+      <div class="founder-content">
+        <div class="founder-eyebrow">Why I built this</div>
+        <h2>A tiny room, a big frustration,<br/>and no good tools.</h2>
+        <p>
+          A while back I was trying to plan my small room — figuring out where the bed should go, whether a sofa would fit, how much space I'd have left to actually move around. Simple questions, but surprisingly hard to answer.
+        </p>
+        <p>
+          I tried the tools that came up in search. Some were too complicated, others wanted me to sign up and pay before I could even drag a sofa across a floor plan. None of them felt made for someone just trying to sort out a small space.
+        </p>
+        <p>
+          So I built RoomWise. No signup. No paywall. Just drag your furniture, see if it fits, and figure out your room — the way it should have been from the start.
+        </p>
+        <div class="founder-sig">— The RoomWise team</div>
+      </div>
+    </div>
+  </section>
+
   <section class="testimonials" id="stories">
     <div class="section-tag">Real stories</div>
     <h2>People who found<br/>their perfect layout</h2>
