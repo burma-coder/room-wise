@@ -351,6 +351,19 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;font-weig
   }
   @keyframes tipFadeIn{from{opacity:0;transform:translate(-50%,-44%)}to{opacity:1;transform:translate(-50%,-50%)}}
 }
+
+.shop-btn{
+  display:flex;align-items:center;justify-content:center;gap:0.4rem;
+  width:100%;margin-top:0.5rem;
+  background:#FF9900;color:#111;
+  border:none;border-radius:3px;
+  padding:0.52rem;
+  font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;
+  cursor:pointer;text-decoration:none;
+  transition:background 0.15s;
+}
+.shop-btn:hover{background:#e88a00;}
+.shop-btn svg{flex-shrink:0;}
 /* Print / PDF styles */
 @media print{
   body{overflow:visible!important;}
@@ -2705,6 +2718,10 @@ function renderProps(){
     <div class="prop-section"><div class="prop-label">Colour</div><div class="prop-colors">${COLORS.map(c=>`<div class="color-swatch${item.color===c?' active':''}" style="background:${c}" onclick="setColor('${c}')"></div>`).join('')}</div></div>
     <button class="prop-btn" onclick="rotateSelected()">↻ Rotate 90°</button>
     <button class="prop-btn danger" onclick="deleteSelected()">✕ Remove</button>
+    <a class="shop-btn" href="${getAmazonLink(item.furnId)}" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#111"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      Shop this on Amazon →
+    </a>
   `;
   ['pw','ph','px','py'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',applyPropEdit);});
 }
@@ -3098,6 +3115,70 @@ function initMobileTip(){
   if(window.location.hash.includes('layout=')) return;
   const tip=document.getElementById('mobileTip');
   if(tip) tip.classList.remove('hidden');
+}
+
+// ─── AMAZON AFFILIATE LINKS ───────────────────────────────────────
+const AMAZON_TAG = 'roomwise0a-20';
+const AMAZON_SEARCH = {
+  'sofa-3':       'sofa 3 seater',
+  'sofa-2':       'sofa 2 seater',
+  'sofa-l':       'L shape sofa',
+  'armchair':     'armchair',
+  'chair':        'dining chair',
+  'stool':        'bar stool',
+  'ottoman':      'ottoman footstool',
+  'bed-king':     'king size bed frame',
+  'bed-queen':    'queen size bed frame',
+  'bed-double':   'double bed frame',
+  'bed-single':   'single bed frame',
+  'bed-bunk':     'bunk bed',
+  'bedside':      'bedside table',
+  'bedside-r':    'bedside table',
+  'dining-6':     'dining table 6 seater',
+  'dining-4':     'dining table 4 seater',
+  'dining-round': 'round dining table',
+  'coffee':       'coffee table',
+  'coffee-round': 'round coffee table',
+  'side-table':   'side table',
+  'console':      'console table',
+  'desk':         'office desk',
+  'desk-corner':  'corner desk',
+  'wardrobe-2':   'wardrobe 2 door',
+  'wardrobe-3':   'wardrobe 3 door',
+  'wardrobe-walk':'walk in wardrobe',
+  'bookshelf':    'bookshelf',
+  'dresser':      'chest of drawers dresser',
+  'cabinet':      'storage cabinet',
+  'shoe-rack':    'shoe rack',
+  'tv':           '55 inch TV',
+  'tv-65':        '65 inch TV',
+  'tv-cabinet':   'TV cabinet',
+  'tv-stand':     'TV stand',
+  'media-unit':   'media unit',
+  'fridge':       'fridge refrigerator',
+  'fridge-2d':    'french door fridge',
+  'washing':      'washing machine',
+  'dryer':        'clothes dryer',
+  'dishwasher':   'dishwasher',
+  'microwave':    'microwave oven',
+  'plant-l':      'large indoor plant',
+  'plant-s':      'indoor plant pot',
+  'rug':          'area rug',
+  'rug-round':    'round rug',
+  'lamp':         'floor lamp',
+  'lamp-table':   'table lamp',
+  'mirror':       'wall mirror',
+  'exercise':     'exercise yoga mat',
+  'bathtub':      'freestanding bathtub',
+  'toilet':       'toilet',
+  'sink':         'bathroom sink',
+  'shower':       'shower enclosure',
+};
+
+function getAmazonLink(furnId){
+  const q=AMAZON_SEARCH[furnId]||'furniture';
+  const url='https://www.amazon.com/s?k='+encodeURIComponent(q)+'&tag='+AMAZON_TAG;
+  return url;
 }
 // ─── INIT ─────────────────────────────────────────────────────────
 buildLibrary();
