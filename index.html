@@ -522,6 +522,46 @@
     }
 
 
+
+    /* ── Privacy Policy ─────────────────────────────────────────── */
+    .privacy-section {
+      padding: 5rem 3rem;
+      background: var(--charcoal);
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .privacy-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .privacy-inner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+    .privacy-inner .privacy-date {
+      font-size: 0.78rem;
+      color: rgba(245,240,232,0.35);
+      margin-bottom: 2rem;
+    }
+    .privacy-inner h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin: 1.8rem 0 0.5rem;
+    }
+    .privacy-inner p {
+      font-size: 0.88rem;
+      color: rgba(245,240,232,0.6);
+      line-height: 1.8;
+      margin-bottom: 0.5rem;
+    }
+    .privacy-inner a {
+      color: var(--terracotta);
+      text-decoration: none;
+    }
     /* ── Founder story ───────────────────────────────────────────── */
     .founder-story {
       padding: 5rem 3rem;
@@ -944,7 +984,7 @@
         <p>
           So I built RoomWise. No signup. No paywall. Just drag your furniture, see if it fits, and figure out your room — the way it should have been from the start.
         </p>
-        <div class="founder-sig">— The RoomWise founder</div>
+        <div class="founder-sig">— RoomWise Founder</div>
       </div>
     </div>
   </section>
@@ -1037,13 +1077,41 @@
   </section>
 
   <!-- FOOTER -->
+
+  <!-- PRIVACY POLICY -->
+  <section class="privacy-section" id="privacy">
+    <div class="privacy-inner">
+      <h2>Privacy Policy</h2>
+      <div class="privacy-date">Last updated: March 2026</div>
+
+      <h3>Overview</h3>
+      <p>RoomWise is a free room planning tool. We are committed to being transparent about how we handle your data. The short version: we collect very little, we don't sell anything, and your room layouts stay on your device.</p>
+
+      <h3>What we collect</h3>
+      <p><strong style="color:rgba(245,240,232,0.8)">Anonymous analytics.</strong> We use Google Analytics to understand how many people visit RoomWise and which features they use. This data is anonymous — we cannot identify individual users. You can opt out by using a browser with tracking protection or the Google Analytics opt-out extension.</p>
+      <p><strong style="color:rgba(245,240,232,0.8)">Feedback form.</strong> If you choose to submit feedback, your message and email address (if provided) are sent to us via Web3Forms. We use this only to respond to your message. We do not share it with anyone.</p>
+
+      <h3>What we don't collect</h3>
+      <p>We do not collect your name, your room layouts, your furniture choices, or any account information. Your room design exists only in your browser — it is never sent to our servers.</p>
+
+      <h3>Cookies</h3>
+      <p>Google Analytics uses cookies to distinguish unique visitors. We do not use any other cookies. We do not use advertising cookies or tracking pixels.</p>
+
+      <h3>Third-party services</h3>
+      <p>RoomWise uses Google Analytics (analytics.google.com) and Web3Forms (web3forms.com) as third-party services. Each has their own privacy policy. Amazon affiliate links may also appear — clicking them takes you to Amazon, where Amazon's privacy policy applies.</p>
+
+      <h3>Contact</h3>
+      <p>If you have any questions about this privacy policy, please <a href="#feedback">send us a message</a> via the feedback form.</p>
+    </div>
+  </section>
+
   <footer>
     <a href="#" class="logo">Room<span style="color:var(--terracotta);font-style:italic">Wise</span></a>
     <div class="footer-links">
-      <a href="#">How it Works</a>
-      <a href="#">Features</a>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Contact</a>
+      <a href="#how">How it Works</a>
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#feedback">Contact</a>
     </div>
     <div class="footer-copy">© 2026 RoomWise. Free forever for personal use. Made with care for people in small spaces.</div>
   </footer>
