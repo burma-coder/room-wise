@@ -1104,7 +1104,7 @@
       <p>RoomWise uses Google Analytics (analytics.google.com) and Web3Forms (web3forms.com) as third-party services. Each has their own privacy policy. Amazon affiliate links may also appear — clicking them takes you to Amazon, where Amazon's privacy policy applies.</p>
 
       <h3>Contact</h3>
-      <p>If you have any questions about this privacy policy, please <a href="#feedback">send us a message</a> via the feedback form.</p>
+      <p>If you have any questions about this privacy policy, please <a href="#feedback">send us a message</a> via the feedback form or email <a href="/cdn-cgi/l/email-protection#204255524d410e564942450e434f44455260474d41494c0e434f4d"><span class="__cf_email__" data-cfemail="4e2c3b3c232f6038272c2b602d212a2b3c0e29232f2722602d2123">[email&#160;protected]</span></a>.</p>
     </div>
   </section>
 
@@ -1165,37 +1165,6 @@
     }, { threshold: 0.1 });
     reveals.forEach(el => observer.observe(el));
 
-    // Feedback form — Web3Forms
-    document.getElementById('feedbackForm').addEventListener('submit', async function(e){
-      e.preventDefault();
-      const btn = document.getElementById('feedbackBtn');
-      const msg = document.getElementById('feedbackMsg').value.trim();
-      if(!msg) return;
-
-      btn.disabled = true;
-      btn.textContent = 'Sending…';
-
-      try {
-        const formData = new FormData(this);
-        const res = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-        if(data.success){
-          document.getElementById('feedbackForm').style.display = 'none';
-          document.getElementById('feedbackSuccess').style.display = 'block';
-        } else {
-          alert('Something went wrong. Please try again.');
-          btn.disabled = false;
-          btn.textContent = 'Send Feedback →';
-        }
-      } catch(err){
-        alert('Something went wrong. Please try again.');
-        btn.disabled = false;
-        btn.textContent = 'Send Feedback →';
-      }
-    });
   </script>
 </body>
 </html>
